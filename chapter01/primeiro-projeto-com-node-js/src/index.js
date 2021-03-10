@@ -32,10 +32,28 @@ app.post("/account", (request, response) => {
 	return response.status(201).send();
 });
 
-app.get("/statement/:cpf", (request, response) => {
-	const { cpf } = request.params;
+// Modo de buscar a informação pelo params
+// app.get("/statement/:cpf", (request, response) => {
+// 	const { cpf } = request.params;
+
+// 	const customer = customers.find(customer => customer.cpf === cpf);
+
+// 	if(!customer){
+// 		return response.status(400).json({error: "Customer not found! :( "});
+// 	}
+
+// 	return response.json(customer.statement);
+// });
+
+// Modo de buscar a informação pelo header
+app.get("/statement/", (request, response) => {
+	const { cpf } = request.headers;
 
 	const customer = customers.find(customer => customer.cpf === cpf);
+
+	if(!customer){
+		return response.status(400).json({error: "Customer not found! :( "});
+	}
 
 	return response.json(customer.statement);
 });
