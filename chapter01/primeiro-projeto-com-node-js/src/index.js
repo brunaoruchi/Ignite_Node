@@ -12,7 +12,25 @@ const customers = [];
  * name - string
  * id - uuid
  * statement - []
+ * ----------------------
+ * Middlewares: Uma função que fica entre o request e response, será utilizado 
+ * nessa aplicação para validação da conta e o token (admin ou user).
  */
+
+function verifyIfExistsAccountCPF(request, response, next) {
+	const { cpf } = request.headers;
+
+	const customer = customers.find(customer => customer.cpf === cpf);
+
+	if(!customer){
+		return response.status(400).json({error: "Customer not found! :( "});
+	}
+
+	//Adiciona informação ao request para a rota que está executando o middleware
+	request.customer = customer; 
+
+	return next();
+}
 
 app.post("/account", (request, response) => {
 	const {cpf, name} = request.body;
@@ -32,29 +50,12 @@ app.post("/account", (request, response) => {
 	return response.status(201).send();
 });
 
-// Modo de buscar a informação pelo params
-// app.get("/statement/:cpf", (request, response) => {
-// 	const { cpf } = request.params;
+//Somente se utiliza quando se quer que todas as rotas abaixo passem por ela.
+//app.use(verifyIfExistsAccountCPF);
 
-// 	const customer = customers.find(customer => customer.cpf === cpf);
-
-// 	if(!customer){
-// 		return response.status(400).json({error: "Customer not found! :( "});
-// 	}
-
-// 	return response.json(customer.statement);
-// });
-
-// Modo de buscar a informação pelo header
-app.get("/statement/", (request, response) => {
-	const { cpf } = request.headers;
-
-	const customer = customers.find(customer => customer.cpf === cpf);
-
-	if(!customer){
-		return response.status(400).json({error: "Customer not found! :( "});
-	}
-
+// Busca a informação pelo header com o middleware específico
+app.get("/statement/", verifyIfExistsAccountCPF,(request, response) => {
+	const {customer} = request;
 	return response.json(customer.statement);
 });
 
