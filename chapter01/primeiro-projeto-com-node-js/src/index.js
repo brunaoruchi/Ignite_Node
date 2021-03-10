@@ -68,12 +68,13 @@ app.post("/account", (request, response) => {
 //app.use(verifyIfExistsAccountCPF);
 
 // Busca a informação pelo header com o middleware específico
-app.get("/statement/", verifyIfExistsAccountCPF,(request, response) => {
+app.get("/statement/", verifyIfExistsAccountCPF, (request, response) => {
 	const { customer } = request;
+
 	return response.json(customer.statement);
 });
 
-app.post("/deposit", verifyIfExistsAccountCPF,(request, response) => {
+app.post("/deposit", verifyIfExistsAccountCPF, (request, response) => {
 	const { description, amount } = request.body;
 	const { customer } = request;
 
@@ -89,7 +90,7 @@ app.post("/deposit", verifyIfExistsAccountCPF,(request, response) => {
 	return response.status(201).send();
 });
 
-app.post("/withdraw", verifyIfExistsAccountCPF,(request, response) => {
+app.post("/withdraw", verifyIfExistsAccountCPF, (request, response) => {
 	const { amount } = request.body;
 	const { customer } = request;
 
@@ -107,6 +108,21 @@ app.post("/withdraw", verifyIfExistsAccountCPF,(request, response) => {
 
 	customer.statement.push(statementOperation);
 	return response.status(201).send();
+});
+
+app.get("/statement/date", verifyIfExistsAccountCPF, (request, response) => {
+	const { customer } = request;
+	const { date } = request.query;
+
+	const dateFormat = new Date(date + " 00:00");
+
+	const statement = customer.statement.filter(
+		(statement) =>
+			statement.created_at.toDateString() ===
+			new Date(dateFormat).toDateString()
+	);
+
+	return response.json(statement);
 });
 
 app.listen(3334);
