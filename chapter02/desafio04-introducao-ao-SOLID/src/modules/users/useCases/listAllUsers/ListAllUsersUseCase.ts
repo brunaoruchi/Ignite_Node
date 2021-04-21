@@ -16,7 +16,7 @@ class ListAllUsersUseCase {
     }
 
     if (!userAlreadyExists.admin) {
-      throw new Error("User Not Admin!");
+      throw new Error("User Isn't Admin!");
     }
 
     const users = this.usersRepository.list();

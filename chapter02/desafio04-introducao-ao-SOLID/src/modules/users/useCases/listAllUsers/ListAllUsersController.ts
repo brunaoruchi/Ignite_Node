@@ -10,7 +10,7 @@ class ListAllUsersController {
       const { user_id } = request.headers;
 
       if (Array.isArray(user_id)) {
-        throw new Error("Isn't id");
+        throw new Error("Isn't id required");
       }
 
       const all = this.listAllUsersUseCase.execute({ user_id });
